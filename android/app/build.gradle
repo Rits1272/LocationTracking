@@ -82,6 +82,9 @@ project.ext.react = [
 
 apply from: "../../node_modules/react-native/react.gradle"
 
+Project background_geolocation = project(':react-native-background-geolocation')
+apply from: "${background_geolocation.projectDir}/app.gradle"
+
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -179,7 +182,10 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-maps')
+    implementation project(':react-native-background-fetch')
+    implementation project(':react-native-background-geolocation')
+    implementation 'com.google.android.gms:play-services-base:10.0.1'
+    implementation 'com.google.android.gms:play-services-maps:10.0.1'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
