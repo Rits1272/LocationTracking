@@ -1,23 +1,34 @@
 // Import BackgroundGeolocation + any optional interfaces
 import BackgroundGeolocation from 'react-native-background-geolocation';
 import React, {Component} from 'react';
-import {Text, View, StyleSheet} from 'react-native';
-import MapView from 'react-native-maps';
-import {Marker} from 'react-native-maps';
+import * as firebase from 'firebase';
+import { Text } from 'react-native';
+import {Container, Button} from 'native-base';
+
+var firebaseConfig = {
+  apiKey: 'AIzaSyAC2xKl-SYu3t6OnHv0hm0O2bYz-9_IHe4',
+  authDomain: 'django-project-1552240590382.firebaseapp.com',
+  databaseURL: 'https://django-project-1552240590382.firebaseio.com',
+  projectId: 'django-project-1552240590382',
+  storageBucket: 'django-project-1552240590382.appspot.com',
+  messagingSenderId: '121951289629',
+  appId: '1:121951289629:web:dfd8a9cfec0cfdef9861f4',
+  measurementId: 'G-MYH3KH3YHH',
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 export default class Home extends Component {
   constructor(props) {
     super(props);
+    var name = this.props.navigation.getParam('user').split('@')[0];
     this.state = {
-      region: {
-        latitude: 22.7183992,
-        longitude: 75.8806232,
-        latitudeDelta: 0.001,
-        longitudeDelta: 0.01,
-      },
+      currentName: name,
     };
     this.onLocation = this.onLocation.bind(this);
-    this.onMotionChange = this.onMotionChange.bind(this);
+    this.saveLiveLocation = this.saveLiveLocation.bind(this);
   }
 
   static navigationOptions = {
@@ -25,6 +36,7 @@ export default class Home extends Component {
   };
 
   componentDidMount() {
+
     // This handler fires whenever bgGeo receives a location update.
     BackgroundGeolocation.onLocation(this.onLocation, this.onError);
 
@@ -77,17 +89,29 @@ export default class Home extends Component {
     );
   }
 
+  saveLiveLocation(lat, long) {
+    firebase
+      .database()
+      .ref(`${this.state.currentName}/`)
+      .set({
+        lat,
+        long,
+      })
+      .then(data => {
+        console.log('Location saved to firebase');
+      })
+      .catch(err => console.log(err));
+  }
+
   // You must remove listeners when your component unmounts
+  componentWillUnmount() {
+    BackgroundGeolocation.removeAllListeners();
+  }
 
   onLocation(location) {
     var latitude = location['coords'].latitude;
     var longitude = location['coords'].longitude;
-    this.setState({
-      region: {
-        latitude: latitude,
-        longitude: longitude,
-      },
-    });
+    this.saveLiveLocation(latitude, longitude);
     console.log('[location] -', location);
   }
   onError(error) {
@@ -104,22 +128,21 @@ export default class Home extends Component {
   }
 
   render() {
-    if(this.onActivityChange){
-      console.log("high")
-    }
-      return (
-        <View style={{flex: 1}}>
-          <MapView style={styles.map} initialRegion={this.state.region}>
-            <Marker coordinate={this.state.region} />
-          </MapView>
-        </View>
-      );
-    }
-  
+    var names = ['ritikjain1272', 'dhananjaypurohit7'];
+    return (
+      <Container>
+        {names.map(name => {
+          return(
+            <Button 
+            block
+            style={{backgroundColor : "#f4511e"}}
+            onPress={()=>
+              this.props.navigation.navigate('MapUser', {user : name})
+            }><Text style={{color : '#fff'}}>{name}</Text></Button>
+          )
+        })}
+      </Container>
+    );
   }
+}
 
-const styles = StyleSheet.create({
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-});
