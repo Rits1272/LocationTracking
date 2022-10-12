@@ -15,7 +15,7 @@
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-background-fetch": "^2.7.1",
-    "react-native-background-geolocation": "^3.4.1",
+    "react-native-background-geolocation": "^4.8.2",
     "react-native-device-info": "2.1.2",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-maps": "0.26.1",
